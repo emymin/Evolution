@@ -1,6 +1,8 @@
 #pragma once
 #include "Segment.h"
 #include <vector>
+
+
 class Genes
 {
 public:
@@ -10,5 +12,6 @@ public:
 	Genes();
 	Genes(std::vector<Segment> _segments,int _symmetry=1,bool _mirror=false);
 	void RandomGenes();
+	void Mutate();
 };
 

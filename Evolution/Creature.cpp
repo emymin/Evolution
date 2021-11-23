@@ -5,16 +5,14 @@
 #define PI 3.14159265
 
 
-Creature::Creature() {
-	genes = Genes();
-	lines = GenerateVertexArray(genes);
-	bounds = lines.getBounds();
-}
+Creature::Creature() : Creature::Creature(Genes(),false) {};
 
 
-Creature::Creature(Genes _genes) {
+Creature::Creature(Genes _genes,bool mutate) {
 	genes = _genes;
+	if (mutate) genes.Mutate();
 	lines = GenerateVertexArray(genes);
+	angle = RandomGen::RandomFloat(0, 2 * PI);
 	bounds = lines.getBounds();
 }
 
@@ -22,54 +20,86 @@ sf::VertexArray Creature::GenerateVertexArray(Genes gen) {
 	sf::VertexArray vertarr(sf::Lines, gen.segments.size() * 2 * gen.symmetry);
 
 	sf::Vector2f curPos;
-	sf::Vector2f center(0, 0);
+	sf::Vector2f zero(0, 0);
+	sf::Vector2f pointCenter = zero;
+	
 	float curAngle = 0;
 	float curRadians = 0;
 	float symmetryAngle = 360 / gen.symmetry;
 
-	Segment curSeg;
+	Segment* curSeg;
 	int index = 0;
 	int simIndex = 0;
 	for (int j = 0; j < gen.symmetry; j++) {
 		curAngle = j * symmetryAngle;
-		curPos = center;
+		curPos = zero;
 		for (int i = 0; i < gen.segments.size(); i++) {
-			curSeg = gen.segments[i];
+			curSeg = &(gen.segments[i]);
 			index = i * 2 + simIndex;
+			pointCenter += curPos;
 			vertarr[index].position = curPos;
-			vertarr[index].color = curSeg.color;
-			curAngle += curSeg.angle;
+			vertarr[index].color = curSeg->color;
+			curAngle += curSeg->angle;
 			curRadians = curAngle * (PI / 180);
-			curPos += curSeg.length*sf::Vector2f(cos(curRadians), sin(curRadians));
+			if (genes.mirror && j%2==0) { curRadians = PI - curRadians - j*symmetryAngle + (j-1)*symmetryAngle; }
+			curPos += curSeg->length*sf::Vector2f(cos(curRadians), sin(curRadians));
+			pointCenter += curPos;
 			index++;
 			vertarr[index].position = curPos;
-			vertarr[index].color = curSeg.color;
+			vertarr[index].color = curSeg->color;
+
+			effects[curSeg->type]++;
 
 		}
 		simIndex += gen.segments.size() * 2;
 	}
+	pointCenter /= (float)gen.segments.size()*2;
+	center = pointCenter;
+	/*bounds = lines.getBounds();
+	bounds.width *= 1.5;
+	bounds.height *= 1.5;*/
 	return vertarr;
 }
-sf::FloatRect Creature::getBounds() {
-	return bounds;
-}
-sf::FloatRect Creature::getGlobalBounds() {
-	return getTransform().transformRect(getBounds());
-}
 
-bool Creature::isPointInside(sf::Vector2f pos) {
-	return (getGlobalBounds().contains(pos));
-}
 
 
 void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+	//const sf::FloatRect& viewport = target.getView().getViewport();
+	//if (viewport.intersects(bounds)) { return; }
+
 	states.transform *= getTransform();
 
+	if (renderBounds) {
+		sf::RenderStates boundstates = states;
+		boundstates.transform.translate(sf::Vector2f(bounds.width / -2, bounds.height / -2));
+		boundstates.transform.translate(center);
+
+		sf::RectangleShape boundRect(sf::Vector2f(bounds.width, bounds.height));
+		boundRect.setFillColor(sf::Color::Transparent);
+		boundRect.setOutlineThickness(2);
+		boundRect.setOutlineColor(sf::Color::Red);
+		target.draw(boundRect, boundstates);
+	}
+	
 	target.draw(lines, states);
+	
 }
 
-void Creature::Update() {
-	/*sf::Vector2f movement;
-	setPosition(getPosition() + movement);*/
+void Creature::Update(float deltaTime) {
+
+	if (effects[Propeller]) {
+		angle += RandomGen::RandomFloat(-0.3, 0.3);
+		sf::Vector2f movement(cos(angle),sin(angle));
+		move(speed*movement*deltaTime*100.f);
+
+	}
+	energy += effects[Algae];
+	energy -= genes.segments.size();
+	//if (energy <= 0) { world->RemoveCreature(this); }
+}
+
+void Creature::Mutate() {
+	genes.Mutate();
+	lines = GenerateVertexArray(genes);
 }

@@ -6,17 +6,23 @@ class Creature : public sf::Drawable, public sf::Transformable
 
 {
 public:
+
 	Genes genes;
 	sf::VertexArray lines;
+	sf::Vector2f center;
 	sf::FloatRect bounds;
+	bool renderBounds = false;
+	int effects[Segment::segmentTypes];
+
+	float energy=100;
+	float speed = 1;
+	float angle = 0;
 
 	Creature();
-	Creature(Genes _genes);
+	Creature(Genes _genes,bool mutate=true);
 	sf::VertexArray GenerateVertexArray(Genes gen);
-	sf::FloatRect getBounds();
-	sf::FloatRect getGlobalBounds();
-	bool isPointInside(sf::Vector2f pos);
-	void Update();
+	void Update(float deltaTime);
+	void Mutate();
 
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

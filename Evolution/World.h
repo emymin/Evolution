@@ -9,9 +9,12 @@ public:
 
 	World();
 	World(int n);
-	void Update();
+	void Update(float deltaTime);
 	void PopulateRandom(int n);
 	void AddCreature(Creature creature);
+	void RemoveCreature(Creature* creature);
+
+	void ToggleAllBounds();
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
