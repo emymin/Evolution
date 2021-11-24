@@ -9,6 +9,7 @@ World::World() {
 World::World(int n) {
 	creatures = std::vector<Creature>();
 	PopulateRandom(n);
+	oxygen = 2000000.f;
 }
 
 void World::PopulateRandom(int n) {
@@ -39,12 +40,21 @@ void World::PopulateRandom(int n) {
 }
 
 void World::AddCreature(Creature creature){
-	//creature.world = this;
 	creatures.push_back(creature);
 }
-void World::RemoveCreature(Creature* creature) {
-	//creatures.erase(std::remove(creatures.begin(), creatures.end(), *creature), creatures.end());
+
+void World::AddCreature(Genes genes, sf::Vector2f position)
+{
+	Creature creature(genes, true);
+	creature.setPosition(position);
+	AddCreature(creature);
 }
+
+void World::RemoveCreature(int i) {
+	creatures[i] = creatures.back();
+	creatures.pop_back();
+}
+
 
 void World::ToggleAllBounds() {
 	for (int i = 0; i < creatures.size(); i++) {
@@ -62,7 +72,16 @@ void World::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void World::Update(float deltaTime) {
+	oxygen += 10000 * deltaTime;
+
 	for (int i = 0; i < creatures.size(); i++) {
-		creatures[i].Update(deltaTime);
+		creatures[i].Update(deltaTime,this);
+
+		
+		if (!creatures[i].isAlive) { RemoveCreature(i); }
+		if (creatures[i].canBirth) { AddCreature(creatures[i].genes, creatures[i].getPosition()); }
+
 	}
+
+
 }

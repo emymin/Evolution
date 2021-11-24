@@ -1,18 +1,26 @@
+#pragma once
+
 #include <vector>
 #include "Creature.h"
-#pragma once
+
+class Creature;
+
 class World : public sf::Drawable
 
 {
 public:
 	std::vector<Creature> creatures;
+	float oxygen;
 
 	World();
 	World(int n);
 	void Update(float deltaTime);
 	void PopulateRandom(int n);
+
 	void AddCreature(Creature creature);
-	void RemoveCreature(Creature* creature);
+	void AddCreature(Genes genes, sf::Vector2f position = {0,0});
+
+	void RemoveCreature(int i);
 
 	void ToggleAllBounds();
 private:

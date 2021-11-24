@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include "Creature.h"
 #include "World.h"
 #include <time.h>
 #include "Utils.h"
@@ -22,9 +21,8 @@ int main()
 	window.setView(view);
 
 	int creature_n=25000;
-	//World world = generateWorld(creature_n);
-	World world;
-	world.AddCreature(Creature());
+	World world = generateWorld(creature_n);
+
 
 	sf::Clock clock;
 	sf::Clock startClock;
@@ -58,11 +56,9 @@ int main()
 		FPS = 1 / deltaTime;
 		t = startClock.getElapsedTime().asSeconds();
 
-		if (t-floor(t)<0.01) {
-			std::string title("Evolution FPS: ");
-			title = title + std::to_string((int)FPS);
-			window.setTitle(title.c_str());
-		}
+		std::string title("Evolution FPS: ");
+		title = title + std::to_string((int)FPS) + " " + std::to_string((int)world.oxygen);
+		window.setTitle(title.c_str());
 
 		if (window.hasFocus()) {
 			sf::Vector2f movement(0, 0);

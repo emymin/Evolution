@@ -62,13 +62,12 @@ sf::VertexArray Creature::GenerateVertexArray(Genes gen) {
 }
 
 
-
+//TODO cull drawing based on bounds
 void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	//const sf::FloatRect& viewport = target.getView().getViewport();
-	//if (viewport.intersects(bounds)) { return; }
-
+	const sf::FloatRect& viewport = target.getView().getViewport();
 	states.transform *= getTransform();
+
 
 	if (renderBounds) {
 		sf::RenderStates boundstates = states;
@@ -76,6 +75,11 @@ void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		boundstates.transform.translate(center);
 
 		sf::RectangleShape boundRect(sf::Vector2f(bounds.width, bounds.height));
+		
+		if (!boundRect.getGlobalBounds().intersects(viewport)) {
+			return;
+		}
+
 		boundRect.setFillColor(sf::Color::Transparent);
 		boundRect.setOutlineThickness(2);
 		boundRect.setOutlineColor(sf::Color::Red);
@@ -86,7 +90,8 @@ void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	
 }
 
-void Creature::Update(float deltaTime) {
+void Creature::Update(float deltaTime,World* world) {
+	if (!isAlive) { return; }
 
 	if (effects[Propeller]) {
 		angle += RandomGen::RandomFloat(-0.3, 0.3);
@@ -94,12 +99,37 @@ void Creature::Update(float deltaTime) {
 		move(speed*movement*deltaTime*100.f);
 
 	}
-	energy += effects[Algae];
-	energy -= genes.segments.size();
-	//if (energy <= 0) { world->RemoveCreature(this); }
+
+	float algaeEnergy = effects[Algae] * deltaTime;
+	world->oxygen -= algaeEnergy;
+	if (world->oxygen < 0) { world->oxygen = 0; algaeEnergy = 0; }
+
+	energy += algaeEnergy;
+
+	energy -= genes.segments.size()*deltaTime;
+
+	if (energy <= 0) {
+		Die();
+	}
+	if (energy > 5000) {
+		Birth();
+		energy -= 4500;
+	}
+
 }
 
 void Creature::Mutate() {
 	genes.Mutate();
 	lines = GenerateVertexArray(genes);
 }
+
+
+void Creature::Die()
+{
+	isAlive = false;
+}
+
+void Creature::Birth() {
+	canBirth = true;
+}
+
