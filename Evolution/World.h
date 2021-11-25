@@ -11,6 +11,7 @@ class World : public sf::Drawable
 public:
 	std::vector<Creature> creatures;
 	float oxygen;
+	bool showBoundingBoxes = false;
 
 	World();
 	World(int n);

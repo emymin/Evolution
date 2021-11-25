@@ -103,8 +103,8 @@ void Creature::Update(float deltaTime,World* world) {
 	}
 
 	float algaeEnergy = effects[Algae] * deltaTime;
-	world->oxygen -= algaeEnergy;
-	if (world->oxygen < 0) { world->oxygen = 0; algaeEnergy = 0; }
+	world->oxygen -= algaeEnergy*0.001f;
+	if (world->oxygen <= 0) { algaeEnergy = 0; }
 
 	energy += algaeEnergy;
 

@@ -9,7 +9,7 @@ World::World() {
 World::World(int n) {
 	creatures = std::vector<Creature>();
 	PopulateRandom(n);
-	oxygen = 2000000.f;
+	oxygen = 0.f;
 }
 
 void World::PopulateRandom(int n) {
@@ -57,8 +57,9 @@ void World::RemoveCreature(int i) {
 
 
 void World::ToggleAllBounds() {
+	showBoundingBoxes = !showBoundingBoxes;
 	for (int i = 0; i < creatures.size(); i++) {
-		creatures[i].renderBounds = !creatures[i].renderBounds;
+		creatures[i].renderBounds = showBoundingBoxes;
 	}
 }
 
@@ -72,7 +73,8 @@ void World::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void World::Update(float deltaTime) {
-	oxygen += 10000 * deltaTime;
+	oxygen += 1000 * deltaTime;
+	if (oxygen < 0) { oxygen = 0; }
 
 	for (int i = 0; i < creatures.size(); i++) {
 		creatures[i].Update(deltaTime,this);

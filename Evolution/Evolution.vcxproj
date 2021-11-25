@@ -80,11 +80,11 @@
     <LibraryPath>$(ProjectDir)\Dependencies\SFML\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)\Dependencies\SFML\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\Dependencies\IMGUI-SFML;$(ProjectDir)\Dependencies\IMGUI;$(ProjectDir)\Dependencies\SFML\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\Dependencies\SFML\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)\Dependencies\SFML\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\Dependencies\SFML\include;$(ProjectDir)\Dependencies\IMGUI;$(ProjectDir)\Dependencies\IMGUI-SFML;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\Dependencies\SFML\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -155,6 +155,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Creature.cpp" />
+    <ClCompile Include="Dependencies\IMGUI-SFML\imgui-SFML.cpp" />
+    <ClCompile Include="Dependencies\IMGUI\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Dependencies\IMGUI\imgui.cpp" />
+    <ClCompile Include="Dependencies\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="Dependencies\IMGUI\imgui_tables.cpp" />
+    <ClCompile Include="Dependencies\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="Genes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Segment.cpp" />
@@ -163,6 +169,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Creature.h" />
+    <ClInclude Include="Dependencies\IMGUI-SFML\imconfig-SFML.h" />
+    <ClInclude Include="Dependencies\IMGUI-SFML\imgui-SFML.h" />
+    <ClInclude Include="Dependencies\IMGUI-SFML\imgui-SFML_export.h" />
+    <ClInclude Include="Dependencies\IMGUI\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="Dependencies\IMGUI\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Dependencies\IMGUI\imconfig.h" />
+    <ClInclude Include="Dependencies\IMGUI\imgui.h" />
+    <ClInclude Include="Dependencies\IMGUI\imgui_internal.h" />
+    <ClInclude Include="Dependencies\IMGUI\imstb_rectpack.h" />
+    <ClInclude Include="Dependencies\IMGUI\imstb_textedit.h" />
+    <ClInclude Include="Dependencies\IMGUI\imstb_truetype.h" />
     <ClInclude Include="Dependencies\SFML\include\SFML\Audio.hpp" />
     <ClInclude Include="Dependencies\SFML\include\SFML\Audio\AlResource.hpp" />
     <ClInclude Include="Dependencies\SFML\include\SFML\Audio\Export.hpp" />

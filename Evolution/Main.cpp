@@ -4,6 +4,9 @@
 #include "Utils.h"
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 World generateWorld(int n) {
 	std::cout << "Generating World" << std::endl;
 	sf::Clock worldGenTime;
@@ -20,6 +23,8 @@ int main()
 	sf::Vector2f defaultSize = view.getSize();
 	window.setView(view);
 
+	ImGui::SFML::Init(window);
+
 	int creature_n=25000;
 	//World world = generateWorld(creature_n);
 	World world;
@@ -31,19 +36,20 @@ int main()
 	float FPS;
 	float t;
 	float movement_multiplier;
+	float deltaTimeMultiplier=1;
+	float scale = 1;
 	while (window.isOpen())
 	{
 		movement_multiplier = 1;
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			ImGui::SFML::ProcessEvent(event);
+
 			if (event.type == sf::Event::Closed) window.close();
 			if (event.type == sf::Event::KeyPressed && window.hasFocus()) {
 				switch (event.key.code) {
-				case(sf::Keyboard::R): { view.setCenter(0, 0); break; }
-				case(sf::Keyboard::B): {world.ToggleAllBounds(); break; }
-				case(sf::Keyboard::M): {world.creatures[0].Mutate(); break; }
-				case(sf::Keyboard::Enter): { world = generateWorld(creature_n); break; }
+					//pressed buttons
 				}
 			}
 			if (event.type == sf::Event::Resized) {
@@ -53,21 +59,20 @@ int main()
 			}
 		}
 
-		deltaTime = clock.restart().asSeconds();
+		sf::Time dt = clock.restart();
+		deltaTime = dt.asSeconds();
 		FPS = 1 / deltaTime;
 		t = startClock.getElapsedTime().asSeconds();
 
-		std::string title("Evolution FPS: ");
-		title = title + std::to_string((int)FPS) + " " + std::to_string((int)world.oxygen);
-		window.setTitle(title.c_str());
+		scale = view.getSize().x / defaultSize.x;
 
 		if (window.hasFocus()) {
 			sf::Vector2f movement(0, 0);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)){ movement_multiplier = 2; }
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) { movement.x = -1; }
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { movement.x = 1; }
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) { movement.y = -1; }
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) { movement.y = 1; }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) { movement.x = -1*scale; }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { movement.x = 1*scale; }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) { movement.y = -1*scale; }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) { movement.y = 1*scale; }
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) { view.zoom((1 + (deltaTime*movement_multiplier))); }
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) { view.zoom(1 / (1 + (deltaTime*movement_multiplier))); }
 			view.move(movement*movement_multiplier*(deltaTime * 500));
@@ -78,9 +83,28 @@ int main()
 
 		window.clear();
 
-		world.Update(deltaTime);
+		world.Update(deltaTime*deltaTimeMultiplier);
 		window.draw(world);
 		
+		ImGui::SFML::Update(window,dt);
+		ImGui::Begin("Info");
+
+		ImGui::Text("FPS: %.1f", FPS);
+		ImGui::Text("Creatures: %d",world.creatures.size());
+		ImGui::Text("Oxygen: %.3f",(world.oxygen));
+		ImGui::SliderFloat("Speed", &deltaTimeMultiplier, 0.1, 10);
+		ImGui::NewLine();
+
+		if (ImGui::Button("Regenerate")) {
+			world = generateWorld(creature_n);
+		}
+		if (ImGui::Button("Show bounding boxes")) {
+			world.ToggleAllBounds();
+		}
+
+		ImGui::End();
+		ImGui::SFML::Render(window);
+
 
 		window.display();
 	}
