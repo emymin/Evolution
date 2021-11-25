@@ -65,9 +65,15 @@ sf::VertexArray Creature::GenerateVertexArray(Genes gen) {
 //TODO cull drawing based on bounds
 void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	const sf::FloatRect& viewport = target.getView().getViewport();
+	const sf::View& view = target.getView();
+
 	states.transform *= getTransform();
 
+	if (getPosition().x > view.getCenter().x+view.getSize().x ||
+		getPosition().y>view.getCenter().y+view.getSize().y ||
+		getPosition().x < view.getCenter().x-view.getSize().x ||
+		getPosition().y < view.getCenter().y-view.getSize().y
+		) { return; }
 
 	if (renderBounds) {
 		sf::RenderStates boundstates = states;
@@ -75,10 +81,6 @@ void Creature::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		boundstates.transform.translate(center);
 
 		sf::RectangleShape boundRect(sf::Vector2f(bounds.width, bounds.height));
-		
-		if (!boundRect.getGlobalBounds().intersects(viewport)) {
-			return;
-		}
 
 		boundRect.setFillColor(sf::Color::Transparent);
 		boundRect.setOutlineThickness(2);
@@ -111,9 +113,9 @@ void Creature::Update(float deltaTime,World* world) {
 	if (energy <= 0) {
 		Die();
 	}
-	if (energy > 5000) {
+	if (energy > 1000) {
 		Birth();
-		energy -= 4500;
+		energy -= 950;
 	}
 
 }

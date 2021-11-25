@@ -78,10 +78,17 @@ void World::Update(float deltaTime) {
 		creatures[i].Update(deltaTime,this);
 
 		
-		if (!creatures[i].isAlive) { RemoveCreature(i); }
+		//if (!creatures[i].isAlive) { RemoveCreature(i); }
 		if (creatures[i].canBirth) { AddCreature(creatures[i].genes, creatures[i].getPosition()); }
 
 	}
+
+	auto end = std::remove_if(creatures.begin(),
+		creatures.end(),
+		[](Creature const& c) {
+			return !c.isAlive;
+		});
+	creatures.erase(end, creatures.end());
 
 
 }

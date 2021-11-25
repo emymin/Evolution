@@ -21,8 +21,9 @@ int main()
 	window.setView(view);
 
 	int creature_n=25000;
-	World world = generateWorld(creature_n);
-
+	//World world = generateWorld(creature_n);
+	World world;
+	world.AddCreature(Creature());
 
 	sf::Clock clock;
 	sf::Clock startClock;
